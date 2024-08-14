@@ -1,0 +1,66 @@
+@import '../../app/scss/variables.scss';
+.sidebar {
+	width: 234px;
+	height: 100vh;
+	font-size: 14px;
+	color: #a1a1aa;
+	padding: 8px 0px;
+	border-right: 2px solid #414144;
+
+	.heading {
+		padding: 8px 16px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		.heading__wrap {
+			.title {
+				color: #a1a1aa;
+				display: inline-block;
+				width: 100%;
+				font-size: 14px;
+			}
+			.subtitle {
+				font-size: 10px;
+			}
+		}
+		border-bottom: 2px solid #414144;
+		margin-bottom: 8px;
+	}
+	.list {
+		.item {
+			display: flex;
+			align-items: center;
+			position: relative;
+			gap: 16px;
+			margin-top: 8px;
+			// margin-bottom: 16px;
+			color: $primary;
+			cursor: pointer;
+			padding: 8px 16px;
+			.text {
+				font-size: 14px;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				opacity: 0; // Начальная прозрачность
+				background-color: #a1a1aa;
+				z-index: -1; // Размещаем псевдоэлемент под контентом
+				transition: opacity 0.6s ease-in-out 0s;
+			}
+
+			&:hover::before {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.ico {
+	cursor: pointer;
+}
