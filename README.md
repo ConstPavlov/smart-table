@@ -1,4 +1,8 @@
-My alternative for CRA<br>
-Uses NodeJS verion 20.11.0<br><br>
-Edit `index.html` before development starts<br>
-Edit `robots.txt` if necessary
+## About project
+
+The smart table project. 
+Technologies: TS, React, Redux, SASS. 
+The ability to edit the table does not work (update method), 
+because a CORS error occurs on the server.
+
+#### **My Email** - *paw.dweb@gmail.com*
