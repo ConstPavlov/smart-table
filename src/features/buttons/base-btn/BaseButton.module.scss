@@ -1,0 +1,17 @@
+.baseButton {
+	padding: 8px;
+	margin-top: 16px;
+	margin-left: 16px;
+	display: flex;
+	width: 32px;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background-color: transparent;
+	border-radius: 8px;
+	transition: background-color 0.8s ease 0s;
+
+	&:hover {
+		background-color: #414144;
+	}
+}

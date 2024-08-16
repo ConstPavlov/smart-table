@@ -1,80 +1,152 @@
 import React, { KeyboardEventHandler } from 'react'
-import BtnCreate from 'src/features/buttons/create-btn/BtnCreate'
-import BtnDelete from 'src/features/buttons/delete-btn/BtnDelete'
-import InfoItem from 'src/features/info/InfoItem'
-import MyInput from 'src/shared/input/MyInput'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+	EditableField,
+	IDataItem,
+	LabelsTable,
+	TreeResponse
+} from 'src/features'
+import {
+	addRow,
+	deleteRow,
+	updateInput,
+	toggleEditing
+} from '../../features/store/table/slice'
+import EditableRow from 'src/features/editable-row/EditableRow'
+
+import { useAppDispatch } from 'src/features/store/store'
+import { tableData } from 'src/features/store/table/selector'
 
 import styles from './Smp.module.scss'
 
-interface IDataItem {
-	id: number
-	name: string
-	salary: number
-	equipment: number
-	expenses: number
-	profits: number
-	isEditing: boolean
-}
+import {
+	fetchCreateRow,
+	fetchListOfRows,
+	fetchRemoveRow,
+	fetchUpdateRow
+} from 'src/features/store/table/service'
+import BaseButton from 'src/features/buttons/base-btn/BaseButton'
+import { OutlayRowRequest, OutlayRowUpdateRequest } from './smp-interface'
+import { findItemById } from 'src/features/helpers/findItemById'
+import { checkAndFetchTableId } from 'src/features/utils/api/checkAndFetchTableId'
+import { fetchList } from 'src/features/utils/api/fetchList'
 
-type EditableField = Exclude<keyof IDataItem, 'isEditing'>
-
-const initialData: IDataItem[] = [
-	{
-		id: 0,
-		name: 'Южная строительная площадка',
-		salary: 20348,
-		equipment: 1750,
-		expenses: 108.07,
-		profits: 1209122.5,
-		isEditing: false
-	}
-]
 export default function Smp() {
-	const [data, setData] = React.useState<IDataItem[]>(initialData)
+	const [idTable, setIdTable] = React.useState<string | null>(null)
+	const [dataServer, setSetDataServer] = React.useState<TreeResponse | []>([])
 	const [hoveredBtn, setHoveredBtn] = React.useState<number | null>(null)
+	const isMounted = React.useRef<boolean>(false)
+	const dispatch = useAppDispatch()
+	const { data, status, error } = useSelector(tableData)
 
-	const handleAddRow = () => {
-		const newRow = {
-			id: data.length + 1,
-			name: '',
-			salary: 0,
-			equipment: 0,
-			expenses: 0,
-			profits: 0,
-			isEditing: true
+	// Табличный iD и  получение Data
+	React.useEffect(() => {
+		const fetchTableIdAndData = async () => {
+			const idTab = await checkAndFetchTableId()
+			if (idTab) {
+				setIdTable(idTab)
+				dispatch(fetchListOfRows(String(idTab)))
+			}
 		}
-		setData((prev) => [...prev, newRow])
+
+		fetchTableIdAndData()
+	}, [dispatch])
+
+	// Добавить row в Redux
+	const handleAddRow = React.useCallback(
+		(parentId: number | null) => {
+			dispatch(addRow({ parentId }))
+		},
+		[dispatch]
+	)
+
+	// Удаление строки
+	const handleDeleteRow = React.useCallback(
+		(id: number) => {
+			dispatch(deleteRow(id))
+			if (idTable) {
+				dispatch(fetchRemoveRow({ idTable, idRow: id }))
+			}
+		},
+		[dispatch, idTable]
+	)
+
+	// Обновление поля строки
+	const handleInputChange = React.useCallback(
+		<K extends EditableField>(id: number, field: K, value: IDataItem[K]) => {
+			dispatch(updateInput({ id, field, value }))
+		},
+		[dispatch]
+	)
+
+	const handleEnterKey = React.useCallback(
+		async (event: React.KeyboardEvent<HTMLInputElement>, id: number) => {
+			const { key } = event
+			if (key === 'Enter' && idTable) {
+				await dispatch(toggleEditing(id))
+				try {
+					const dataServer: any = await fetchList()
+					console.log('fetch List на возвразает:', dataServer)
+					const itemToUpdate = findItemById(dataServer, id)
+					console.log('findItemById на возвразает:', itemToUpdate)
+					if (itemToUpdate) {
+						const idUpd = String(itemToUpdate.id)
+						const updatePayload: OutlayRowUpdateRequest = {
+							rowName: itemToUpdate.rowName || '',
+							salary: itemToUpdate.salary || 0,
+							equipmentCosts: itemToUpdate.equipmentCosts || 0,
+							estimatedProfit: itemToUpdate.estimatedProfit || 0,
+							materials: itemToUpdate.materials || 0,
+							overheads: itemToUpdate.overheads || 0,
+							machineOperatorSalary: itemToUpdate.machineOperatorSalary || 0,
+							mainCosts: itemToUpdate.mainCosts || 0,
+							mimExploitation: itemToUpdate.mimExploitation || 0,
+							supportCosts: itemToUpdate.supportCosts || 0
+						}
+						await dispatch(fetchUpdateRow({ idTable, updatePayload, idUpd }))
+					} else {
+						const itemToCreate = findItemById(data, id)
+
+						const newRow: OutlayRowRequest = {
+							rowName: itemToCreate?.rowName || '',
+							salary: itemToCreate?.salary || 0,
+							equipmentCosts: itemToCreate?.equipmentCosts || 0,
+							estimatedProfit: itemToCreate?.estimatedProfit || 0,
+							materials: itemToCreate?.materials || 0,
+							overheads: itemToCreate?.overheads || 0,
+							machineOperatorSalary: itemToCreate?.machineOperatorSalary || 0,
+							mainCosts: itemToCreate?.mainCosts || 0,
+							mimExploitation: itemToCreate?.mimExploitation || 0,
+							machine: itemToCreate?.machine || 0,
+							supportCosts: itemToCreate?.supportCosts || 0,
+							parentId: itemToCreate?.parentId ?? null
+						}
+
+						await dispatch(fetchCreateRow({ idTable, newRow }))
+					}
+				} catch (error) {
+					console.error('Failed to update or create row:', error)
+				}
+			}
+		},
+		[dispatch, data, idTable]
+	)
+
+	const updateFn = React.useCallback(
+		(id: number) => {
+			dispatch(toggleEditing(id))
+		},
+		[dispatch]
+	)
+
+	if (status === 'loading') {
+		return <div>Loading...</div>
 	}
 
-	const handleDeleteRow = (id: number) => {
-		const withoutCurrent = data.filter((el) => el.id !== id)
-
-		setData(withoutCurrent)
+	if (status === 'error') {
+		return <div>Error: {error}</div>
 	}
 
-	const handleInputChange = <K extends EditableField>(
-		index: number,
-		field: K,
-		value: IDataItem[K]
-	) => {
-		const updatedData = [...data]
-		updatedData[index][field] = value
-		setData(updatedData)
-	}
-
-	const handleEnterKey = (
-		event: React.KeyboardEvent<HTMLInputElement>,
-		index: number
-	) => {
-		const { key } = event
-		if (key === 'Enter') {
-			const updatedData = [...data]
-			updatedData[index].isEditing = false
-			setData(updatedData)
-		}
-	}
-
-	React.useEffect(() => {}, [])
 	return (
 		<div className={styles.wrapper}>
 			<div className={styles.head}>
@@ -82,111 +154,26 @@ export default function Smp() {
 			</div>
 
 			<div className={styles.smp}>
-				<div className={styles.labels}>
-					<div className={styles.labels__leftSide}>
-						<span>Уровень</span>
-						<span className={styles.works}>Наименование работ</span>
-					</div>
-					<div className={styles.labels__rightSide}>
-						<span>Основная з/п</span>
-						<span>Оборудование</span>
-						<span>Накладные расходы</span>
-						<span>Сметная прибыль</span>
-					</div>
-				</div>
+				<LabelsTable />
 
-				{data.map((item, index) => (
-					<div className={styles.info} key={index}>
-						<div className={styles.info__leftSide}>
-							<div className={styles.btns_wrap}>
-								{!item.isEditing && (
-									<div
-										className={styles.btns}
-										onMouseEnter={() => setHoveredBtn(item.id)}
-										onMouseLeave={() => setHoveredBtn(null)}
-									>
-										<BtnCreate createRow={handleAddRow} />
-										{hoveredBtn === item.id && (
-											<BtnDelete deleteRow={() => handleDeleteRow(item.id)} />
-										)}
-									</div>
-								)}
-							</div>
-
-							{item.isEditing ? (
-								<MyInput
-									placeholder='Наименование'
-									value={item.name || ''}
-									onChange={(e: any) =>
-										handleInputChange(index, 'name', e.target.value)
-									}
-								/>
-							) : (
-								<span>{item.name}</span>
-							)}
-						</div>
-						<div className={styles.info__rightSide}>
-							{item.isEditing ? (
-								<>
-									<MyInput
-										value={Number(item.salary)}
-										onChange={(e: any) =>
-											handleInputChange(
-												index,
-												'salary',
-												parseFloat(e.target.value)
-											)
-										}
-										onKeyDown={(event: any) => handleEnterKey(event, index)}
-									/>
-									<MyInput
-										value={Number(item.equipment)}
-										onChange={(e) =>
-											handleInputChange(
-												index,
-												'equipment',
-												Number(e.target.value)
-											)
-										}
-										onKeyDown={(event) => handleEnterKey(event, index)}
-									/>
-									<MyInput
-										value={item.expenses}
-										onChange={(e) =>
-											handleInputChange(
-												index,
-												'expenses',
-												parseFloat(e.target.value)
-											)
-										}
-										onKeyDown={(event) => handleEnterKey(event, index)}
-									/>
-									<MyInput
-										value={item.profits}
-										onChange={(e) =>
-											handleInputChange(
-												index,
-												'profits',
-												parseFloat(e.target.value)
-											)
-										}
-										onKeyDown={(event) => handleEnterKey(event, index)}
-									/>
-								</>
-							) : (
-								<>
-									<span>{item.salary}</span>
-									<span>{item.equipment}</span>
-									<span>{item.expenses}</span>
-									<span>{item.profits}</span>
-								</>
-							)}
-						</div>
-					</div>
-				))}
-				{/* <div className={styles.addRow}>
-					<button onClick={handleAddRow}>Добавить новую строку</button>
-				</div> */}
+				{data.length === 0 ? (
+					<BaseButton handleAddRow={handleAddRow} />
+				) : (
+					data.map((item) => (
+						<EditableRow
+							key={item.id}
+							item={item}
+							id={item.id}
+							hoveredBtn={hoveredBtn}
+							handleEnterKey={handleEnterKey}
+							handleInputChange={handleInputChange}
+							handleAddRow={handleAddRow}
+							handleDeleteRow={handleDeleteRow}
+							setHoveredBtn={setHoveredBtn}
+							updateFn={updateFn}
+						/>
+					))
+				)}
 			</div>
 		</div>
 	)

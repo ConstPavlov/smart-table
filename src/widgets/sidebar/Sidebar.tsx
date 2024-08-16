@@ -1,17 +1,9 @@
 import React from 'react'
 import style from './Sidebar.module.scss'
 import IcoSidebar from '../../app/assets/sidebar-ico.svg'
-import { Link } from 'react-router-dom'
 import ArrowIco from '../../app/assets/sidebar-arrow-ico.svg'
-export const namesAbbr = [
-	'По проекту',
-	'Объекты',
-	'РД',
-	'МТО',
-	'СМР',
-	'График',
-	'МиМ'
-]
+import { namesAbbr } from './consts/consts'
+
 export default function Sidebar() {
 	return (
 		<div className={style.sidebar}>
