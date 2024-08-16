@@ -23,7 +23,7 @@ module.exports = () => {
 			path: PATH_OUTPUT_FOLDER,
 			filename: '[name].[fullhash:8].js',
 			chunkFilename: '[name].[chunkhash:8].js',
-			publicPath: '/'
+			publicPath: 'auto'
 		},
 		resolve: {
 			extensions: ['.js', '.jsx', '.ts', '.tsx', '.css', '.scss', '.sass'],
