@@ -1,4 +1,18 @@
 .input {
+	// Перемещаем объявления вверх
+	padding: 6px 20px;
+	width: 100%;
+	background: transparent;
+	margin-top: 20px;
+	color: #fff;
+	font-size: 18px;
+	border-radius: 6px; // Возможно, одна из строк с border-radius является лишней
+	outline: none;
+	border: 1px solid #414144;
+	box-shadow: 1px 2px 18px rgba(99, 97, 113, 0.558);
+	box-sizing: border-box;
+
+	// Вложенные правила
 	&::-webkit-outer-spin-button,
 	&::-webkit-inner-spin-button {
 		-webkit-appearance: none;
@@ -8,19 +22,6 @@
 	& {
 		-moz-appearance: textfield;
 	}
-
-	padding: 6px 20px;
-	width: 100%;
-	background: transparent;
-	margin-top: 20px;
-	color: #fff;
-	font-size: 18px;
-	border-radius: 6px;
-	border-radius: 8px;
-	outline: none;
-	border: 1px solid #414144;
-	box-shadow: 1px 2px 18px rgba(99, 97, 113, 0.558);
-	box-sizing: border-box;
 
 	&::placeholder {
 		font-size: 14px;

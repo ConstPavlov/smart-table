@@ -4,7 +4,7 @@
 	"author": "Pavlov",
 	"scripts": {
 		"start": "webpack serve --progress",
-		"build": "webpack build --progress"
+		"build": "webpack --mode development --progress"
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^2.2.7",

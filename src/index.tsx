@@ -1,8 +1,8 @@
+import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { App } from './app/App'
 import { router } from './app/router/router'
 import { RouterProvider } from 'react-router-dom'
-import './app/scss/App.style'
+import './app/scss/style.scss'
 
 const container = document.getElementById('root')!
 const root = createRoot(container)
