@@ -2,22 +2,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import axios from '../../../app/axios/axios'
 import { FetchCreateParams, FetchUpdateParams } from './types'
 
-// createTable ID
-export const createTableId = createAsyncThunk(
-	'table/createTableId',
-	async () => {
-		try {
-			const response = await axios.post('/v1/outlay-rows/entity/create')
-
-			const idTable = await response.data.id
-
-			return idTable
-		} catch (error: any) {
-			throw new Error(error)
-		}
-	}
-)
-
 // ---------
 // get list
 // ---------
@@ -54,7 +38,7 @@ export const fetchUpdateRow = createAsyncThunk(
 	'table/fetchUpdateRow',
 	async (params: FetchUpdateParams) => {
 		const { idTable, updatePayload, idUpd } = params
-		const { data } = await axios.patch(
+		const { data } = await axios.post(
 			`/v1/outlay-rows/entity/${idTable}/row/${idUpd}/update`,
 			updatePayload
 		)

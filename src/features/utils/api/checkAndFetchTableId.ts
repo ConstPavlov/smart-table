@@ -2,22 +2,24 @@ import axios from '../../../app/axios/axios'
 import { setToLS } from '../setToLS'
 import { geIDFromLS } from '../getFromLS'
 
-// Асинхронная функция для проверки и создания idTable
 export const checkAndFetchTableId = async (): Promise<string | null> => {
 	let idTab = String(geIDFromLS('idTable'))
-	console.log('idTab тот что в LS', idTab)
+	console.log('idTab из LocalStorage:', idTab)
 
-	if (!idTab) {
+	if (!idTab || idTab === 'null') {
 		try {
 			const response = await axios.post('/v1/outlay-rows/entity/create')
 			const newIdTable = response.data.id
+			console.log('Новый idTable создан:', newIdTable)
 
 			setToLS('idTable', newIdTable)
 			idTab = newIdTable
 		} catch (error: any) {
-			throw new Error(error)
+			console.error('Ошибка создания idTable:', error)
+			return null
 		}
 	}
 
+	console.log('Возвращаем idTable:', idTab)
 	return idTab
 }

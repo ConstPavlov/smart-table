@@ -4,9 +4,9 @@ import { checkAndFetchTableId } from './checkAndFetchTableId'
 
 export const fetchList = async () => {
 	const idTab = await checkAndFetchTableId()
-	if (!idTab) {
-		throw new Error('Failed to fetch or create idTable.')
-	}
+	// if (!idTab) {
+	// 	throw new Error('Failed to fetch or create idTable.')
+	// }
 	if (idTab) {
 		try {
 			const { data } = await axios.get<TreeResponse[]>(

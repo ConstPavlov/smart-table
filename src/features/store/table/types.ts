@@ -7,7 +7,6 @@ import {
 export interface ITable {
 	data: IDataItem[]
 	idSet: Set<number>
-	idTable: number | null
 	status: Status
 	error: string | null
 }

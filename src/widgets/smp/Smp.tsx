@@ -44,6 +44,7 @@ export default function Smp() {
 		const fetchTableIdAndData = async () => {
 			const idTab = await checkAndFetchTableId()
 			if (idTab) {
+				console.log(idTab)
 				setIdTable(idTab)
 				dispatch(fetchListOfRows(String(idTab)))
 			}
@@ -87,6 +88,7 @@ export default function Smp() {
 				try {
 					const dataServer: any = await fetchList()
 					console.log('fetch List на возвразает:', dataServer)
+					console.log('id у нас', id)
 					const itemToUpdate = findItemById(dataServer, id)
 					console.log('findItemById на возвразает:', itemToUpdate)
 					if (itemToUpdate) {
@@ -104,6 +106,7 @@ export default function Smp() {
 							supportCosts: itemToUpdate.supportCosts || 0
 						}
 						await dispatch(fetchUpdateRow({ idTable, updatePayload, idUpd }))
+						// await dispatch(fetchListOfRows(idTable))
 					} else {
 						const itemToCreate = findItemById(data, id)
 
@@ -123,6 +126,7 @@ export default function Smp() {
 						}
 
 						await dispatch(fetchCreateRow({ idTable, newRow }))
+						await dispatch(fetchListOfRows(idTable))
 					}
 				} catch (error) {
 					console.error('Failed to update or create row:', error)

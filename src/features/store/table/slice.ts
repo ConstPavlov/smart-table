@@ -1,10 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IDataItem } from 'src/features/editable-row/editable-interface'
 import { generateUniqueId } from 'src/features/helpers/generateUniqueId'
-import { geIDFromLS } from 'src/features/utils/getFromLS'
-import { setToLS } from 'src/features/utils/setToLS'
+
 import {
-	createTableId,
 	fetchCreateRow,
 	fetchListOfRows,
 	fetchRemoveRow,
@@ -17,7 +15,6 @@ import { ITable, Status } from './types'
 const initialState: ITable = {
 	data: [],
 	idSet: new Set(),
-	idTable: null,
 	status: Status.LOADING,
 	error: null
 }
@@ -132,22 +129,7 @@ const tableSlice = createSlice({
 		}
 	},
 	extraReducers: (builder) => {
-		builder.addCase(createTableId.fulfilled, (state, action) => {
-			state.idTable = action.payload
-			state.status = Status.SUCCESS
-			setToLS('idTable', action.payload)
-			console.log(action, 'SUCCESS')
-		})
-		builder.addCase(createTableId.pending, (state, action) => {
-			state.idTable = null
-			state.status = Status.LOADING
-			console.log(action, 'LOADING')
-		})
 		builder
-			.addCase(createTableId.rejected, (state, action) => {
-				state.idTable = null
-				state.status = Status.ERROR
-			})
 			.addCase(fetchListOfRows.pending, (state) => {
 				state.status = Status.LOADING
 			})
